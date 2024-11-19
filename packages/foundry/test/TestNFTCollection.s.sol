@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
-import "../src/contracts/NFTCollection.sol";
+import "../contracts/NFTCollection.sol";
 
 contract NFTCollectionTest is Test {
     NFTCollection public nftCollection;
