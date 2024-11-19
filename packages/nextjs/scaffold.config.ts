@@ -1,4 +1,5 @@
 import * as chains from "viem/chains";
+import { defineChain } from "viem";
 
 export type ScaffoldConfig = {
   targetNetworks: readonly chains.Chain[];
@@ -8,9 +9,37 @@ export type ScaffoldConfig = {
   onlyLocalBurnerWallet: boolean;
 };
 
+const NETWORKS = {
+  tenderly: defineChain({
+    id: 73571,
+    name: "Tenderly Testnet",
+    network: "tenderly",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: {
+      default: {
+        http: ["https://virtual.mainnet.rpc.tenderly.co/5c01811f-b989-4713-b9d4-88cd6ba46aba"],
+      },
+      public: {
+        http: ["https://virtual.mainnet.rpc.tenderly.co/5c01811f-b989-4713-b9d4-88cd6ba46aba"],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Tenderly Dashboard",
+        url: "https://dashboard.tenderly.co",
+      },
+    },
+  }),
+};
+
 const scaffoldConfig = {
   // The networks on which your DApp is live
-  targetNetworks: [chains.foundry],
+  // targetNetworks: [chains.foundry],
+  targetNetworks: [NETWORKS.tenderly],
 
   // The interval at which your front-end polls the RPC servers for new data
   // it has no effect if you only target the local network (default is 4000)

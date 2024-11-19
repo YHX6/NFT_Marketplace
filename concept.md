@@ -19,7 +19,14 @@ forge script script/DeployNFTCollection.s.sol --rpc-url $TENDERLY_VIRTUAL_TESTNE
 # access token
 otWg9KKN3F5PLUgHAe939h7Vy6P6rYVU
 
+# adrre
+0x7166cc0b9d21dc9f218d70f18bedd5170aaef737
+
 ```
+
+
+
+
 
 
 
