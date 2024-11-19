@@ -1,5 +1,28 @@
 # Concept
 
+
+
+```bash
+
+
+# 1.In packages/foundry directory
+cd ./packages/foundry
+
+# 2.load env
+source .env
+
+# 3.deploy to tenderly
+forge script script/DeployNFTCollection.s.sol --rpc-url $TENDERLY_VIRTUAL_TESTNET_RPC \
+--private-key $PRIVATE_KEY
+
+
+# access token
+otWg9KKN3F5PLUgHAe939h7Vy6P6rYVU
+
+```
+
+
+
 ## Example websites:
 
 (1) https://opensea.io/
