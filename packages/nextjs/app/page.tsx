@@ -6,7 +6,7 @@ import { useAccount } from "wagmi";
 import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Address } from "~~/components/scaffold-eth";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import axios from "axios";
 import { notification } from "~~/utils/scaffold-eth";
@@ -71,14 +71,29 @@ const Home: NextPage = () => {
   };
 
   // Handle file drops
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif']
-    },
-    onDrop: acceptedFiles => {
+  // const { getRootProps, getInputProps } = useDropzone({
+  //   accept: {
+  //     'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+  //   },
+  //   onDrop: acceptedFiles => {
+  //     setFiles(acceptedFiles);
+  //   }
+  // });
+    // Updated dropzone implementation with proper typing
+    const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
       setFiles(acceptedFiles);
-    }
-  });
+    }, []);
+  
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+      accept: {
+        'image/*': ['.png', '.jpg', '.jpeg', '.gif']
+      },
+      onDrop,
+      multiple: true, // Allow multiple file uploads
+      maxSize: 5242880, // Optional: 5MB max file size
+    });
+  
+
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
