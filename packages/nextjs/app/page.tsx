@@ -9,17 +9,15 @@ import { Address } from "~~/components/scaffold-eth";
 import { useEffect, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import axios from "axios";
-import { 
-  useScaffoldContract, 
-  useScaffoldContractWrite,  
-  notification 
-} from "~~/utils/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
+import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+// import { mintNFT } from "~~/utils/mintNFT";
+import NFTCollectionABI from "../../foundry/out/NFTCollection.sol/NFTCollection.json";
+import { BrowserProvider, Contract } from "ethers";
 
 const JWT = process.env.NEXT_PUBLIC_PINATA_JWT;
 
 const Home: NextPage = () => {
-
-
   const { address } = useAccount();
   const [files, setFiles] = useState<FileWithPath[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -29,6 +27,10 @@ const Home: NextPage = () => {
     description: "",
     imageUrls: [] as string[],
   });
+  // Call useScaffoldWriteContract at the top level
+  // const { writeContractAsync: writeYourContractAsync } = useScaffoldWriteContract("NFTCollection");
+  // console.log(writeYourContractAsync);
+
 
   // Handle file upload to Pinata
   const uploadToPinata = async (file: File) => {
@@ -100,6 +102,8 @@ const Home: NextPage = () => {
 
       const metadataUrls = await Promise.all(metadataPromises);
 
+      console.log("Uploaded Metadata to Pinata:", metadataUrls);
+
       // Create collection metadata
       const collectionMetadata = {
         name: collectionData.name,
@@ -109,10 +113,63 @@ const Home: NextPage = () => {
       };
 
       const baseUri = await uploadMetadataToPinata(collectionMetadata);
+      console.log("Base URI: ", baseUri);
 
       // Deploy contract with IPFS metadata
-      // Contract deployment code here...
+      // 使用 BrowserProvider 替代 Web3Provider
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+
+
+      // 合约实例
+      // 0x7166cc0b9d21dc9f218d70f18bedd5170aaef737
+      // 0x54549F80b6A7D5B0d618EA4200ad8d4a3e318eCf
+      const nftContract = new Contract("0x54549F80b6A7D5B0d618EA4200ad8d4a3e318eCf", NFTCollectionABI.abi, signer);
+
+      console.log(nftContract);
+      console.log(Object.keys(nftContract));
+
+
+
+      // Step 5: Mint NFTs and set Token URIs
+      for (let index = 0; index < metadataUrls.length; index++) {
+        const metadataUrl = metadataUrls[index];
+        try {
+          console.log(`Minting token with metadata URI: ${metadataUrl}`);
+          const mintTx = await nftContract.mint(signer.address); // Call mint function
+          const receipt = await mintTx.wait();
       
+          console.log(receipt);
+          console.log(receipt.logs);
+
+          // Extract tokenId from the event logs
+          const event = receipt.logs.find(log => {
+            try {
+              return nftContract.interface.getEvent(log.topics[0]) === 'TokenMinted';
+            } catch (err) {
+              return false;
+            }
+          });
+
+          if (event) {
+            const decodedEvent = nftContract.interface.decodeEventLog('TokenMinted', event.data, event.topics);
+            const tokenId = decodedEvent.tokenId.toNumber();
+            console.log(`Minted tokenId: ${tokenId}`);
+             // Set tokenURI for the minted token
+            const setTokenUriTx = await nftContract.setTokenURI(tokenId, metadataUrl);
+            await setTokenUriTx.wait();
+            console.log(`Set tokenURI for tokenId ${tokenId}`);
+          } else {
+            console.error("TokenMinted event not found in receipt");
+          }
+      
+         
+        } catch (error) {
+          console.error(`Error minting or setting tokenURI for tokenId ${index + 1}:`, error);
+        }
+      }
+
       notification.success("Collection created successfully!");
     } catch (error) {
       console.error("Error creating collection:", error);
@@ -121,6 +178,7 @@ const Home: NextPage = () => {
       setUploading(false);
     }
   };
+
 
   // Rest of the component 
   return (

@@ -37,6 +37,9 @@ contract NFTCollection is ERC721, ERC721Enumerable, Ownable {
         maxSupply = _maxSupply;
     }
 
+    // Event declaration
+    event TokenMinted(address indexed to, uint256 indexed tokenId);
+
     function mint(address to) public onlyOwner returns (uint256) {
         require(_currentTokenId < maxSupply, "Maximum supply reached");
         
@@ -44,9 +47,14 @@ contract NFTCollection is ERC721, ERC721Enumerable, Ownable {
         uint256 newTokenId = _currentTokenId;
         
         _safeMint(to, newTokenId);
+
+        // Emit the event
+        emit TokenMinted(to, newTokenId);
         
         return newTokenId;
     }
+
+
 
     function batchMint(address to, uint256 quantity) public onlyOwner {
         require(_currentTokenId + quantity <= maxSupply, "Would exceed maximum supply");
