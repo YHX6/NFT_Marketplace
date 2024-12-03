@@ -7,14 +7,25 @@ import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Address } from "~~/components/scaffold-eth";
 
 import { useEffect, useState, useCallback } from "react";
-import { FileWithPath, useDropzone } from "react-dropzone";
-import axios from "axios";
 import { notification } from "~~/utils/scaffold-eth";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
-// import { mintNFT } from "~~/utils/mintNFT";
-// import NFTCollectionABI from "../../foundry/out/NFTCollection.sol/NFTCollection.json";
+
 import NFTCollectionABI from "../contracts/NFTCollection.json";
+
+
 import { BrowserProvider, Contract } from "ethers";
+import { FileWithPath, useDropzone } from "react-dropzone";
+import axios from "axios";
+
+// import { BrowserProvider, Contract } from "../../../node_modules/ethers";
+// import { FileWithPath, useDropzone } from "../../../node_modules/react-dropzone";
+// import axios from "../../../node_modules/axios";
+
+
+type Log = {
+  topics: string[];
+  // Add other properties as needed based on your log data structure
+};
 
 const JWT = process.env.NEXT_PUBLIC_PINATA_JWT;
 
@@ -139,8 +150,6 @@ const Home: NextPage = () => {
 
 
       // 合约实例
-      // 0x7166cc0b9d21dc9f218d70f18bedd5170aaef737
-      // 0x54549F80b6A7D5B0d618EA4200ad8d4a3e318eCf
       const nftContract = new Contract("0x54549F80b6A7D5B0d618EA4200ad8d4a3e318eCf", NFTCollectionABI.abi, signer);
 
       console.log(nftContract);
@@ -160,9 +169,25 @@ const Home: NextPage = () => {
           console.log(receipt.logs);
 
           // Extract tokenId from the event logs
-          const event = receipt.logs.find(log => {
+          // const event = receipt.logs.find(log => {
+          //   try {
+          //     return nftContract.interface.getEvent(log.topics[0]) === 'TokenMinted';
+          //   } catch (err) {
+          //     return false;
+          //   }
+          // });
+          // const event = receipt.logs.find((log: Log) => {
+          //   try {
+          //     return nftContract.interface.getEvent(log.topics[0]) === 'TokenMinted';
+          //   } catch (err) {
+          //     return false;
+          //   }
+          // });
+
+          const event = receipt.logs.find((log: Log) => {
             try {
-              return nftContract.interface.getEvent(log.topics[0]) === 'TokenMinted';
+              const eventFragment = nftContract.interface.getEvent(log.topics[0]);
+              return eventFragment?.name === 'TokenMinted';
             } catch (err) {
               return false;
             }
