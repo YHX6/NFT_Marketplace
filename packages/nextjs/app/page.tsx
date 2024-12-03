@@ -12,7 +12,8 @@ import axios from "axios";
 import { notification } from "~~/utils/scaffold-eth";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 // import { mintNFT } from "~~/utils/mintNFT";
-import NFTCollectionABI from "../../foundry/out/NFTCollection.sol/NFTCollection.json";
+// import NFTCollectionABI from "../../foundry/out/NFTCollection.sol/NFTCollection.json";
+import NFTCollectionABI from "../contracts/NFTCollection.json";
 import { BrowserProvider, Contract } from "ethers";
 
 const JWT = process.env.NEXT_PUBLIC_PINATA_JWT;
