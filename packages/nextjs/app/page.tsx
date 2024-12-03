@@ -44,6 +44,10 @@ const Home: NextPage = () => {
   // console.log(writeYourContractAsync);
 
 
+  useEffect(() => {
+    console.log(JWT);
+  }, [])
+
   // Handle file upload to Pinata
   const uploadToPinata = async (file: File) => {
     try {
